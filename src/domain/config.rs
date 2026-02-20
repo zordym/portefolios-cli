@@ -1,7 +1,7 @@
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
 use std::fs;
-use anyhow::{Result, Context};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -40,11 +40,10 @@ impl Config {
 
     /// Load configuration from a specific file
     fn load_from_file(path: &Path) -> Result<Self> {
-        let content = fs::read_to_string(path)
-            .context("Failed to read configuration file")?;
+        let content = fs::read_to_string(path).context("Failed to read configuration file")?;
 
-        let mut config: Config = toml::from_str(&content)
-            .context("Failed to parse configuration file")?;
+        let mut config: Config =
+            toml::from_str(&content).context("Failed to parse configuration file")?;
 
         // Override with environment variables if present
         if let Ok(token) = std::env::var("GITLAB_TOKEN") {
@@ -56,16 +55,14 @@ impl Config {
 
     /// Save configuration to file
     pub fn save(&self, path: &Path) -> Result<()> {
-        let content = toml::to_string_pretty(self)
-            .context("Failed to serialize configuration")?;
+        let content = toml::to_string_pretty(self).context("Failed to serialize configuration")?;
 
         // Create parent directory if it doesn't exist
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
 
-        fs::write(path, content)
-            .context("Failed to write configuration file")?;
+        fs::write(path, content).context("Failed to write configuration file")?;
 
         Ok(())
     }
@@ -102,7 +99,7 @@ impl Config {
 
 impl Default for Config {
     fn default() -> Self {
-        let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+        let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("../.."));
 
         Self {
             portfolio_root: current_dir.clone(),

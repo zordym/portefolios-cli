@@ -1,8 +1,9 @@
-use crate::config::Config;
-use crate::models::{Portfolio, Project};
+use crate::domain::config::Config;
+use crate::domain::models::portfolio::Portfolio;
+use crate::domain::models::project::Project;
 use anyhow::Result;
-use walkdir::WalkDir;
 use std::fs;
+use walkdir::WalkDir;
 
 pub fn load_portfolio(config: &Config) -> Result<Portfolio> {
     let mut portfolio = Portfolio::new();

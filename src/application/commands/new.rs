@@ -1,10 +1,13 @@
-use crate::config::Config;
-use crate::models::{Project, Language, Architecture, Status};
-use anyhow::{Result, Context};
+use crate::domain::config::Config;
+use crate::domain::models::architecture::Architecture;
+use crate::domain::models::language::Language;
+use crate::domain::models::project::Project;
+use crate::domain::models::status::Status;
+use anyhow::{Context, Result};
+use chrono::Utc;
 use colored::Colorize;
 use std::fs;
 use std::path::Path;
-use chrono::Utc;
 
 pub fn execute(
     config: &Config,
@@ -26,7 +29,10 @@ pub fn execute(
     let project_path = config.portfolio_root.join(&project_id);
 
     if project_path.exists() {
-        anyhow::bail!("Project directory already exists: {}", project_path.display());
+        anyhow::bail!(
+            "Project directory already exists: {}",
+            project_path.display()
+        );
     }
 
     println!("→ Creating directory structure...");
@@ -58,7 +64,7 @@ fn create_structure(path: &Path, arch: &Architecture, lang: &Language) -> Result
     let src_base = match lang {
         Language::Kotlin => path.join("src/main/kotlin"),
         Language::Java => path.join("src/main/java"),
-        Language::Rust => path.join("src"),
+        Language::Rust => path.join("../.."),
     };
 
     match arch {
@@ -68,31 +74,31 @@ fn create_structure(path: &Path, arch: &Architecture, lang: &Language) -> Result
             fs::create_dir_all(src_base.join("domain/ports/output"))?;
             fs::create_dir_all(src_base.join("application"))?;
             fs::create_dir_all(src_base.join("infrastructure/adapters"))?;
-        },
+        }
         Architecture::Onion => {
             fs::create_dir_all(src_base.join("domain/core"))?;
             fs::create_dir_all(src_base.join("domain/services"))?;
             fs::create_dir_all(src_base.join("infrastructure"))?;
             fs::create_dir_all(src_base.join("presentation"))?;
-        },
+        }
         Architecture::Layered => {
             fs::create_dir_all(src_base.join("presentation"))?;
             fs::create_dir_all(src_base.join("application"))?;
             fs::create_dir_all(src_base.join("domain"))?;
             fs::create_dir_all(src_base.join("infrastructure"))?;
-        },
+        }
         Architecture::Pipeline => {
             fs::create_dir_all(src_base.join("ingestion"))?;
             fs::create_dir_all(src_base.join("processing"))?;
             fs::create_dir_all(src_base.join("output"))?;
-        },
+        }
         Architecture::Microkernel => {
             fs::create_dir_all(src_base.join("core"))?;
             fs::create_dir_all(src_base.join("plugins"))?;
-        },
+        }
     }
 
-    fs::create_dir_all(path.join("docs"))?;
+    fs::create_dir_all(path.join("../../../docs"))?;
 
     Ok(())
 }
@@ -100,7 +106,8 @@ fn create_structure(path: &Path, arch: &Architecture, lang: &Language) -> Result
 fn create_build_config(path: &Path, lang: &Language, project_id: &str) -> Result<()> {
     match lang {
         Language::Kotlin => {
-            let build_gradle = format!(r#"plugins {{
+            let build_gradle = format!(
+                r#"plugins {{
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
     id("org.springframework.boot") version "3.2.1"
@@ -118,31 +125,41 @@ dependencies {{
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }}
-"#);
+"#
+            );
             fs::write(path.join("build.gradle.kts"), build_gradle)?;
-            fs::write(path.join("settings.gradle.kts"), format!("rootProject.name = \"{}\"", project_id))?;
-        },
+            fs::write(
+                path.join("settings.gradle.kts"),
+                format!("rootProject.name = \"{}\"", project_id),
+            )?;
+        }
         Language::Java => {
-            let pom = format!(r#"<?xml version="1.0"?>
+            let pom = format!(
+                r#"<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.portfolio</groupId>
     <artifactId>{}</artifactId>
     <version>0.1.0</version>
 </project>
-"#, project_id);
+"#,
+                project_id
+            );
             fs::write(path.join("pom.xml"), pom)?;
-        },
+        }
         Language::Rust => {
-            let cargo = format!(r#"[package]
+            let cargo = format!(
+                r#"[package]
 name = "{}"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-"#, project_id);
-            fs::write(path.join("Cargo.toml"), cargo)?;
-        },
+"#,
+                project_id
+            );
+            fs::write(path.join("../../../Cargo.toml"), cargo)?;
+        }
     }
     Ok(())
 }
@@ -156,7 +173,8 @@ fn create_documentation(
 ) -> Result<()> {
     let desc = description.unwrap_or("Project description");
 
-    let readme = format!(r#"# {}
+    let readme = format!(
+        r#"# {}
 
 ## Description
 
@@ -184,11 +202,14 @@ Instructions for running the project.
 ## Documentation
 
 See `ARCHITECTURE.md` for detailed architecture documentation.
-"#, name, desc, arch, lang, arch, lang);
+"#,
+        name, desc, arch, lang, arch, lang
+    );
 
     fs::write(path.join("README.md"), readme)?;
 
-    let architecture_doc = format!(r#"# Architecture Documentation
+    let architecture_doc = format!(
+        r#"# Architecture Documentation
 
 ## Overview
 
@@ -201,7 +222,9 @@ Key architectural decisions and their rationale.
 ## Components
 
 Description of main components and their responsibilities.
-"#, arch);
+"#,
+        arch
+    );
 
     fs::write(path.join("ARCHITECTURE.md"), architecture_doc)?;
 
@@ -215,12 +238,12 @@ fn init_git(path: &Path) -> Result<()> {
         .output()
         .context("Failed to initialize git")?;
 
-    let gitignore = match std::fs::read_to_string(path.join("Cargo.toml")) {
+    let gitignore = match std::fs::read_to_string(path.join("../../../Cargo.toml")) {
         Ok(_) => "target/\n*.lock\n",
         Err(_) => "build/\n.gradle/\ntarget/\n*.class\n",
     };
 
-    fs::write(path.join(".gitignore"), gitignore)?;
+    fs::write(path.join("../../../.gitignore"), gitignore)?;
 
     std::process::Command::new("git")
         .args(&["add", "."])
@@ -260,8 +283,7 @@ fn save_metadata(
     };
 
     let toml = toml::to_string_pretty(&project)?;
-    fs::write(path.join("project.toml"), toml)?;
+    fs::write(path.join("../../../project.toml"), toml)?;
 
     Ok(())
 }
-

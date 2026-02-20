@@ -1,5 +1,5 @@
-use crate::config::Config;
-use crate::utils;
+use crate::domain::config::Config;
+use crate::domain::utils;
 use anyhow::Result;
 use colored::Colorize;
 use tabled::{Table, Tabled, settings::Style};
@@ -35,51 +35,55 @@ pub fn execute(
     Ok(())
 }
 
-fn print_table(projects: &[&crate::models::Project]) {
+fn print_table(projects: &[&crate::domain::models::project::Project]) {
     if projects.is_empty() {
         println!("{}", "No projects found matching the filters.".yellow());
         return;
     }
 
-    let rows: Vec<ProjectRow> = projects.iter().map(|p| ProjectRow {
-        name: p.name.clone(),
-        language: p.language.to_string(),
-        architecture: p.architecture.to_string(),
-        status: format_status(&p.status),
-    }).collect();
+    let rows: Vec<ProjectRow> = projects
+        .iter()
+        .map(|p| ProjectRow {
+            name: p.name.clone(),
+            language: p.language.to_string(),
+            architecture: p.architecture.to_string(),
+            status: format_status(&p.status),
+        })
+        .collect();
 
     let table = Table::new(rows).with(Style::modern()).to_string();
     println!("\n{}", table);
     println!("\n{}: {}", "Total".bold(), projects.len());
 }
 
-fn print_json(projects: &[&crate::models::Project]) -> Result<()> {
+fn print_json(projects: &[&crate::domain::models::project::Project]) -> Result<()> {
     let json = serde_json::to_string_pretty(projects)?;
     println!("{}", json);
     Ok(())
 }
 
-fn print_compact(projects: &[&crate::models::Project]) {
+fn print_compact(projects: &[&crate::domain::models::project::Project]) {
     if projects.is_empty() {
         println!("{}", "No projects found.".yellow());
         return;
     }
 
     for project in projects {
-        println!("{} ({}) - {} [{}]",
-                 project.name.bold(),
-                 project.language,
-                 project.architecture,
-                 format_status(&project.status)
+        println!(
+            "{} ({}) - {} [{}]",
+            project.name.bold(),
+            project.language,
+            project.architecture,
+            format_status(&project.status)
         );
     }
     println!("\n{}: {}", "Total".bold(), projects.len());
 }
 
-fn format_status(status: &crate::models::Status) -> String {
+fn format_status(status: &crate::domain::models::status::Status) -> String {
     match status {
-        crate::models::Status::Completed => "✓ Completed".to_string(),
-        crate::models::Status::InProgress => "◐ In Progress".to_string(),
-        crate::models::Status::Planned => "○ Planned".to_string(),
+        crate::domain::models::status::Status::Completed => "✓ Completed".to_string(),
+        crate::domain::models::status::Status::InProgress => "◐ In Progress".to_string(),
+        crate::domain::models::status::Status::Planned => "○ Planned".to_string(),
     }
 }

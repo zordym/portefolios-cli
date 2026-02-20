@@ -1,5 +1,5 @@
-use crate::config::Config;
-use crate::utils;
+use crate::domain::config::Config;
+use crate::domain::utils;
 use anyhow::Result;
 use colored::Colorize;
 use std::process::{Command, Stdio};
@@ -12,24 +12,31 @@ pub fn execute(
     debug: bool,
 ) -> Result<()> {
     let portfolio = utils::load_portfolio(config)?;
-    let project = portfolio.find_by_name(project_name)
+    let project = portfolio
+        .find_by_name(project_name)
         .ok_or_else(|| anyhow::anyhow!("Project not found: {}", project_name))?;
 
     println!("\n{} Starting project: {}", "→".blue(), project.name.bold());
 
     match project.language {
-        crate::models::Language::Kotlin | crate::models::Language::Java => {
+        crate::domain::models::language::Language::Kotlin
+        | crate::domain::models::language::Language::Java => {
             run_jvm_project(&project.path, port, profile, debug)?;
-        },
-        crate::models::Language::Rust => {
+        }
+        crate::domain::models::language::Language::Rust => {
             run_rust_project(&project.path, port, debug)?;
-        },
+        }
     }
 
     Ok(())
 }
 
-fn run_jvm_project(path: &str, port: Option<u16>, profile: Option<&str>, debug: bool) -> Result<()> {
+fn run_jvm_project(
+    path: &str,
+    port: Option<u16>,
+    profile: Option<&str>,
+    debug: bool,
+) -> Result<()> {
     let project_path = std::path::Path::new(path);
 
     let mut cmd = if project_path.join("gradlew").exists() {
@@ -55,7 +62,10 @@ fn run_jvm_project(path: &str, port: Option<u16>, profile: Option<&str>, debug: 
     }
 
     if debug {
-        cmd.env("JAVA_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005");
+        cmd.env(
+            "JAVA_OPTS",
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
+        );
         println!("{} Debug mode enabled on port 5005", "→".yellow());
     }
 

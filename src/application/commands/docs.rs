@@ -1,5 +1,5 @@
-use crate::config::Config;
-use crate::utils;
+use crate::domain::config::Config;
+use crate::domain::utils;
 use anyhow::Result;
 use std::fs;
 
@@ -23,7 +23,10 @@ pub fn execute(config: &Config, output: &str, format: &str, detailed: bool) -> R
         if detailed {
             doc_content.push_str(&format!("\n{}\n", project.description));
             if !project.frameworks.is_empty() {
-                doc_content.push_str(&format!("\n**Frameworks**: {}\n", project.frameworks.join(", ")));
+                doc_content.push_str(&format!(
+                    "\n**Frameworks**: {}\n",
+                    project.frameworks.join(", ")
+                ));
             }
         }
         doc_content.push_str("\n---\n\n");

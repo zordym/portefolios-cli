@@ -1,5 +1,5 @@
-use crate::config::Config;
-use crate::utils;
+use crate::domain::config::Config;
+use crate::domain::utils;
 use anyhow::Result;
 use std::process::Command;
 
@@ -10,7 +10,8 @@ pub fn execute(
     terminal: bool,
 ) -> Result<()> {
     let portfolio = utils::load_portfolio(config)?;
-    let project = portfolio.find_by_name(project_name)
+    let project = portfolio
+        .find_by_name(project_name)
         .ok_or_else(|| anyhow::anyhow!("Project not found: {}", project_name))?;
 
     if terminal {
@@ -24,9 +25,7 @@ pub fn execute(
 }
 
 fn open_in_editor(path: &str, editor: &str) -> Result<()> {
-    Command::new(editor)
-        .arg(path)
-        .spawn()?;
+    Command::new(editor).arg(path).spawn()?;
 
     println!("Opening project in {}", editor);
     Ok(())
@@ -44,9 +43,7 @@ fn open_terminal(path: &str) -> Result<()> {
         .spawn()?;
 
     #[cfg(target_os = "windows")]
-    Command::new("cmd")
-        .args(&["/c", "start", path])
-        .spawn()?;
+    Command::new("cmd").args(&["/c", "start", path]).spawn()?;
 
     Ok(())
 }
