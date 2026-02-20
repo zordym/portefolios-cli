@@ -1,0 +1,10 @@
+id = "portfolio-cli"
+name = "Portfolio CLI"
+description = "Command line tools to manage a portfolio"
+language = "rust"
+architecture = "layered"
+path = "/home/data/portfolio/portfolio-cli"
+status = "in-progress"
+frameworks = ["clap", "thiserror"]
+created_at = "2026-02-20T22:00:00Z"
+updated_at = "2026-02-20T23:00:00Z"
