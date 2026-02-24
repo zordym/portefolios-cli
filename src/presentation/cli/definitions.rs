@@ -1,9 +1,7 @@
-use crate::application::commands::{docs, list, new, open, run};
-use crate::domain::config;
 use clap::{Parser, Subcommand};
 
 /// Architecture Portfolio CLI - Manage your portfolio projects
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(name = "portfolio-cli")]
 #[command(version = "0.1.0")]
 #[command(about = "CLI tool for managing architecture portfolio projects", long_about = None)]
@@ -20,7 +18,7 @@ pub struct Cli {
     pub verbose: bool,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 pub enum Commands {
     /// List all projects in the portfolio
     List {
@@ -39,29 +37,28 @@ pub enum Commands {
         /// Output format (table, json, compact)
         #[arg(long, default_value = "table")]
         format: String,
+
+        /// Show statistics
+        #[arg(long)]
+        stats: bool,
     },
 
     /// Create a new project
     New {
         /// Project name
-        #[arg(long)]
         name: String,
 
         /// Programming language (kotlin, java, rust)
         #[arg(long)]
         language: String,
 
-        /// Architecture type (hexagonal, onion, layered, pipeline)
+        /// Architecture type (hexagonal, onion, layered, pipeline, microkernel)
         #[arg(long)]
         architecture: String,
 
         /// Project description
         #[arg(long)]
         description: Option<String>,
-
-        /// Interactive mode for guided setup
-        #[arg(long, short)]
-        interactive: bool,
     },
 
     /// Open a project in your editor
@@ -102,11 +99,7 @@ pub enum Commands {
         #[arg(long, default_value = "docs")]
         output: String,
 
-        /// Format (markdown, html)
-        #[arg(long, default_value = "markdown")]
-        format: String,
-
-        /// Include project details
+        /// Include detailed project information
         #[arg(long)]
         detailed: bool,
     },
@@ -117,73 +110,43 @@ pub enum Commands {
         #[arg(long)]
         force: bool,
     },
-}
 
-pub fn parse_cli() -> anyhow::Result<()> {
-    let cli = Cli::parse();
+    /// Update a project
+    Update {
+        /// Project name or ID
+        project: String,
 
-    // Handle init command separately as it creates the config
-    if let Commands::Init { force } = cli.command {
-        return config::init_config(force);
-    }
+        /// New description
+        #[arg(long)]
+        description: Option<String>,
 
-    // Load configuration
-    let config = config::Config::load(cli.config.as_deref())?;
+        /// New status
+        #[arg(long)]
+        status: Option<String>,
 
-    if cli.verbose {
-        println!("Configuration loaded from: {:?}", config.config_path());
-    }
+        /// Add framework
+        #[arg(long)]
+        add_framework: Vec<String>,
 
-    // Execute commands
-    match cli.command {
-        Commands::List {
-            language,
-            architecture,
-            status,
-            format,
-        } => {
-            list::execute(&config, language, architecture, status, &format)?;
-        }
-        Commands::New {
-            name,
-            language,
-            architecture,
-            description,
-            interactive,
-        } => {
-            new::execute(
-                &config,
-                &name,
-                &language,
-                &architecture,
-                description.as_deref(),
-                interactive,
-            )?;
-        }
-        Commands::Open {
-            project,
-            editor,
-            terminal,
-        } => {
-            open::execute(&config, &project, editor.as_deref(), terminal)?;
-        }
-        Commands::Run {
-            project,
-            port,
-            profile,
-            debug,
-        } => {
-            run::execute(&config, &project, port, profile.as_deref(), debug)?;
-        }
-        Commands::Docs {
-            output,
-            format,
-            detailed,
-        } => {
-            docs::execute(&config, &output, &format, detailed)?;
-        }
-        Commands::Init { .. } => unreachable!(),
-    }
+        /// Remove framework
+        #[arg(long)]
+        remove_framework: Vec<String>,
 
-    Ok(())
+        /// GitLab URL
+        #[arg(long)]
+        gitlab_url: Option<String>,
+    },
+
+    /// Delete a project
+    Delete {
+        /// Project name or ID
+        project: String,
+
+        /// Skip confirmation
+        #[arg(long)]
+        yes: bool,
+    },
+
+    /// Show portfolio statistics
+    Stats,
 }
