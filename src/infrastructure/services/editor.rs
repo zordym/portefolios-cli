@@ -89,32 +89,11 @@ impl Default for SystemTerminalService {
 
 impl TerminalService for SystemTerminalService {
     fn open(&self, path: &Path) -> InfrastructureResult<()> {
-        #[cfg(target_os = "macos")]
-        {
-            Command::new("open")
-                .args(["-a", "Terminal"])
-                .arg(path)
-                .spawn()
-                .map_err(|e| InfrastructureError::ProcessError(e.to_string()))?;
-        }
-
-        #[cfg(target_os = "linux")]
-        {
-            Command::new("gnome-terminal")
-                .arg("--working-directory")
-                .arg(path)
-                .spawn()
-                .map_err(|e| InfrastructureError::ProcessError(e.to_string()))?;
-        }
-
-        #[cfg(target_os = "windows")]
-        {
-            Command::new("cmd")
-                .args(["/c", "start"])
-                .arg(path)
-                .spawn()
-                .map_err(|e| InfrastructureError::ProcessError(e.to_string()))?;
-        }
+        Command::new("gnome-terminal")
+            .arg("--working-directory")
+            .arg(path)
+            .spawn()
+            .map_err(|e| InfrastructureError::ProcessError(e.to_string()))?;
 
         tracing::info!("Opened terminal at: {}", path.display());
         Ok(())

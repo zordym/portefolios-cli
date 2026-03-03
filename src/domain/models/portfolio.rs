@@ -23,8 +23,6 @@ impl Portfolio {
     pub fn from_projects(projects: Vec<Project>) -> Self {
         let mut portfolio = Self::new();
         for project in projects {
-            // Use unwrap here since we're building the initial state
-            // In practice, duplicates should be handled during loading
             let _ = portfolio.add_project(project);
         }
         portfolio
@@ -32,7 +30,6 @@ impl Portfolio {
 
     /// Add a project to the portfolio
     pub fn add_project(&mut self, project: Project) -> DomainResult<()> {
-        // Check for duplicate ID
         if self.id_index.contains_key(project.id()) {
             return Err(DomainError::ProjectAlreadyExists(project.id().to_string()));
         }
@@ -55,7 +52,6 @@ impl Portfolio {
 
         let project = self.projects.remove(index);
 
-        // Rebuild index since indices shifted
         self.rebuild_index();
 
         Ok(project)

@@ -10,38 +10,27 @@ use std::path::{Path, PathBuf};
 /// This is a rich domain model with business behavior, not just data.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Project {
-    /// Unique identifier
     id: ProjectId,
 
-    /// Human-readable name
     name: ProjectName,
 
-    /// Project description
     description: String,
 
-    /// Programming language
     language: Language,
 
-    /// Architecture pattern
     architecture: Architecture,
 
-    /// File system path
     path: PathBuf,
 
-    /// Current status
     status: Status,
 
-    /// Frameworks and libraries used
     frameworks: Vec<String>,
 
-    /// GitLab repository URL
     #[serde(skip_serializing_if = "Option::is_none")]
     gitlab_url: Option<String>,
 
-    /// Creation timestamp
     created_at: DateTime<Utc>,
 
-    /// Last update timestamp
     updated_at: DateTime<Utc>,
 }
 
@@ -103,8 +92,6 @@ impl Project {
         }
     }
 
-    // ==================== Getters ====================
-
     pub fn id(&self) -> &ProjectId {
         &self.id
     }
@@ -148,8 +135,6 @@ impl Project {
     pub fn updated_at(&self) -> DateTime<Utc> {
         self.updated_at
     }
-
-    // ==================== Business Methods ====================
 
     /// Update the project description
     pub fn set_description(&mut self, description: impl Into<String>) {

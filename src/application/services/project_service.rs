@@ -137,8 +137,7 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
 
     fn create_directory_structure(&self, project: &Project) -> ApplicationResult<()> {
         let base_path = project.path();
-        fs::create_dir_all(base_path)
-            .map_err(|err| ApplicationError::ProjectNotFound(String::from(err.description())))?;
+        fs::create_dir_all(base_path).map_err(|err| InfrastructureError::Io(err))?;
 
         let src_base = match project.language() {
             Language::Kotlin => base_path.join("src/main/kotlin"),
@@ -148,14 +147,11 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
 
         // Create architecture-specific directories
         for layer in project.architecture().typical_layers() {
-            fs::create_dir_all(src_base.join(layer)).map_err(|err| {
-                ApplicationError::ProjectNotFound(String::from(err.description()))
-            })?;
+            fs::create_dir_all(src_base.join(layer)).map_err(|err| InfrastructureError::Io(err))?;
         }
 
-        // Create docs directory
-        fs::create_dir_all(base_path.join("docs"))
-            .map_err(|err| ApplicationError::ProjectNotFound(String::from(err.description())))?;
+        // Create docs directories
+        fs::create_dir_all(base_path.join("docs")).map_err(|err| InfrastructureError::Io(err))?;
 
         Ok(())
     }
@@ -187,9 +183,8 @@ dependencies {{
 }}
 "#
                 );
-                fs::write(path.join("build.gradle.kts"), build_gradle).map_err(|err| {
-                    ApplicationError::ProjectNotFound(String::from(err.description()))
-                })?;
+                fs::write(path.join("build.gradle.kts"), build_gradle)
+                    .map_err(|err| InfrastructureError::Io(err))?;
                 fs::write(
                     path.join("settings.gradle.kts"),
                     format!("rootProject.name = \"{}\"", project_id),
@@ -208,9 +203,7 @@ dependencies {{
 "#,
                     project_id
                 );
-                fs::write(path.join("pom.xml"), pom).map_err(|err| {
-                    ApplicationError::ProjectNotFound(String::from(err.description()))
-                })?;
+                fs::write(path.join("pom.xml"), pom).map_err(|err| InfrastructureError::Io(err))?;
             }
             Language::Rust => {
                 let cargo = format!(
@@ -223,9 +216,8 @@ edition = "2021"
 "#,
                     project_id
                 );
-                fs::write(path.join("Cargo.toml"), cargo).map_err(|err| {
-                    ApplicationError::ProjectNotFound(String::from(err.description()))
-                })?;
+                fs::write(path.join("Cargo.toml"), cargo)
+                    .map_err(|err| InfrastructureError::Io(err))?;
             }
         }
 

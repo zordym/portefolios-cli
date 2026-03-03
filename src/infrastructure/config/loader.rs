@@ -21,10 +21,10 @@ impl ConfigLoader {
     /// Load configuration from a specific file
     fn load_from_file(path: &Path) -> InfrastructureResult<Config> {
         let content = fs::read_to_string(path)?;
-        let mut config: Config = toml::from_str(&content)?;
+        let config: Config = toml::from_str(&content)?;
 
         // Override with environment variables if present
-        if let Ok(token) = std::env::var("GITLAB_TOKEN") {
+        if let Ok(_) = std::env::var("GITLAB_TOKEN") {
             // Store token handling will be added later
             tracing::debug!("GitLab token loaded from environment");
         }
@@ -38,10 +38,10 @@ impl ConfigLoader {
 
         // Create parent directory if it doesn't exist
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)?;
+            fs::create_dir_all(parent).map_err(|err| InfrastructureError::Io(err))?;
         }
 
-        fs::write(path, content)?;
+        fs::write(path, content).map_err(|err| InfrastructureError::Io(err))?;
         Ok(())
     }
 

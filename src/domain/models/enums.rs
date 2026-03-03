@@ -39,8 +39,7 @@ impl Language {
     /// Get the build file name for this language
     pub fn build_file(&self) -> &'static str {
         match self {
-            Language::Kotlin => "build.gradle.kts",
-            Language::Java => "pom.xml",
+            Language::Kotlin | Language::Java => "build.gradle.kts",
             Language::Rust => "Cargo.toml",
         }
     }

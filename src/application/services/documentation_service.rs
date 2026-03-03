@@ -1,8 +1,6 @@
 use crate::application::errors::{ApplicationError, ApplicationResult};
 use crate::domain::Portfolio;
 use crate::infrastructure::InfrastructureError;
-use serde::de::Unexpected::Str;
-use std::error::Error;
 use std::fs;
 use std::path::Path;
 
@@ -21,8 +19,7 @@ impl DocumentationService {
         output_dir: &Path,
         detailed: bool,
     ) -> ApplicationResult<()> {
-        fs::create_dir_all(output_dir)
-            .map_err(|err| ApplicationError::ProjectNotFound(String::from(err.description())))?;
+        fs::create_dir_all(output_dir).map_err(|err| InfrastructureError::Io(err))?;
         let mut content = String::from("# Architecture Portfolio\n\n");
         content.push_str("## Projects Overview\n\n");
 
