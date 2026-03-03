@@ -5,7 +5,9 @@
 //! - Thin command handlers
 //! - Output formatters
 
+pub mod app_context;
 pub mod cli;
+pub mod cli_application;
 pub mod commands;
 pub mod formatters;
 
