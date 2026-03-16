@@ -163,9 +163,10 @@ impl Portfolio {
 
     /// Get portfolio statistics
     pub fn statistics(&self) -> PortfolioStatistics {
-        let mut stats = PortfolioStatistics::default();
-
-        stats.total_projects = self.projects.len();
+        let mut stats = PortfolioStatistics {
+            total_projects: self.projects.len(),
+            ..Default::default()
+        };
 
         for project in &self.projects {
             // Count by status

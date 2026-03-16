@@ -68,14 +68,16 @@ impl EditorService for SystemEditorService {
 }
 
 /// Terminal service for opening terminals
+#[allow(dead_code)]
 pub trait TerminalService: Send + Sync {
     /// Open a terminal in a directory
     fn open(&self, path: &Path) -> InfrastructureResult<()>;
 }
-
+#[allow(dead_code)]
 pub struct SystemTerminalService;
 
 impl SystemTerminalService {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self
     }

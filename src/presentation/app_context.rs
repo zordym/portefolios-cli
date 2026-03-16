@@ -1,12 +1,12 @@
 use crate::application::DocumentationService;
 use crate::infrastructure::FileSystemPortfolioRepository;
 use crate::infrastructure::services::{GitService, SystemEditorService, SystemProcessRunner};
-use crate::{Config, PortfolioService, ProjectService};
+use crate::{ConfigStructure, PortfolioService, ProjectService};
 use std::sync::Arc;
 
 /// Application context holding all services
 pub struct AppContext {
-    pub config: Config,
+    pub config: ConfigStructure,
     pub project_service: Arc<ProjectService<FileSystemPortfolioRepository, GitService>>,
     pub portfolio_service: Arc<PortfolioService<FileSystemPortfolioRepository>>,
     pub documentation_service: Arc<DocumentationService>,
@@ -15,7 +15,7 @@ pub struct AppContext {
 }
 
 impl AppContext {
-    pub fn new(config: Config) -> Self {
+    pub fn new(config: ConfigStructure) -> Self {
         // Create infrastructure services
         let repository = Arc::new(FileSystemPortfolioRepository::new(&config.portfolio_root));
         let vcs = Arc::new(GitService::new());

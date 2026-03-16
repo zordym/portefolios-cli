@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 /// Application configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Config {
+pub struct ConfigStructure {
     /// Root directory containing portfolio projects
     pub portfolio_root: PathBuf,
 
@@ -21,7 +21,7 @@ pub struct Config {
     pub cache_dir: Option<PathBuf>,
 }
 
-impl Config {
+impl ConfigStructure {
     /// Create a default configuration
     pub fn default_config() -> Self {
         let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
@@ -48,7 +48,7 @@ impl Config {
     }
 }
 
-impl Default for Config {
+impl Default for ConfigStructure {
     fn default() -> Self {
         Self::default_config()
     }

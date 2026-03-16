@@ -11,7 +11,7 @@ pub mod errors;
 pub mod repositories;
 pub mod services;
 
-pub use config::Config;
+pub use config::ConfigStructure;
 // Re-export commonly used types
 pub use errors::InfrastructureError;
 pub use repositories::{FileSystemPortfolioRepository, PortfolioRepository};

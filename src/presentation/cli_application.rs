@@ -1,4 +1,4 @@
-use crate::Config;
+use crate::ConfigStructure;
 use crate::infrastructure::config::ConfigLoader;
 use crate::presentation::app_context::AppContext;
 use crate::presentation::{Cli, Commands, commands};
@@ -60,7 +60,7 @@ impl CliApplication {
         Ok(None)
     }
 
-    fn load_config(&self) -> anyhow::Result<Config> {
+    fn load_config(&self) -> anyhow::Result<ConfigStructure> {
         let config = ConfigLoader::load(self.cli.config.as_deref())?;
 
         if self.cli.verbose {
@@ -110,8 +110,8 @@ impl CliApplication {
 
             Commands::Open {
                 project,
-                editor,
-                terminal,
+                editor: _editor,
+                terminal: _terminal,
             } => {
                 use crate::application::dto::ProjectQuery;
 
@@ -124,9 +124,9 @@ impl CliApplication {
 
             Commands::Run {
                 project,
-                port,
-                profile,
-                debug,
+                port: _port,
+                profile: _profile,
+                debug: _debug,
             } => {
                 use crate::application::dto::ProjectQuery;
                 //use portfolio_cli::infrastructure::services::RunConfig;
@@ -138,9 +138,9 @@ impl CliApplication {
                 println!("→ Starting project: {}", proj.name());
 
                 //let run_config = RunConfig {
-                //    port,
-                //    profile,
-                //    debug,
+                //    _port,
+                //    _profile,
+                //    _debug,
                 //};
                 //
                 //ctx.process_runner.run(proj.path(), proj.language(), &run_config)?;

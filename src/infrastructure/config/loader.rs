@@ -1,4 +1,4 @@
-use super::Config;
+use super::ConfigStructure;
 use crate::infrastructure::errors::{InfrastructureError, InfrastructureResult};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -8,20 +8,20 @@ pub struct ConfigLoader;
 
 impl ConfigLoader {
     /// Load configuration from a file or use default
-    pub fn load(custom_path: Option<&str>) -> InfrastructureResult<Config> {
+    pub fn load(custom_path: Option<&str>) -> InfrastructureResult<ConfigStructure> {
         let config_path = Self::resolve_config_path(custom_path);
 
         if config_path.exists() {
             Self::load_from_file(&config_path)
         } else {
-            Ok(Config::default())
+            Ok(ConfigStructure::default())
         }
     }
 
     /// Load configuration from a specific file
-    fn load_from_file(path: &Path) -> InfrastructureResult<Config> {
+    fn load_from_file(path: &Path) -> InfrastructureResult<ConfigStructure> {
         let content = fs::read_to_string(path)?;
-        let config: Config = toml::from_str(&content)?;
+        let config: ConfigStructure = toml::from_str(&content)?;
 
         // Override with environment variables if present
         if std::env::var("GITLAB_TOKEN").is_ok() {
@@ -33,7 +33,7 @@ impl ConfigLoader {
     }
 
     /// Save configuration to file
-    pub fn save(config: &Config, path: &Path) -> InfrastructureResult<()> {
+    pub fn save(config: &ConfigStructure, path: &Path) -> InfrastructureResult<()> {
         let content = toml::to_string_pretty(config)?;
 
         // Create a parent directory if it doesn't exist
@@ -84,7 +84,7 @@ impl ConfigLoader {
             )));
         }
 
-        let config = Config::default();
+        let config = ConfigStructure::default();
         Self::save(&config, &config_path)?;
 
         Ok(config_path)
