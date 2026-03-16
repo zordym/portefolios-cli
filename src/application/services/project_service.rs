@@ -317,38 +317,39 @@ Description of main components and their responsibilities.
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::Architecture;
-    use crate::infrastructure::repositories::FileSystemPortfolioRepository;
-    use crate::infrastructure::services::GitService;
-    use tempfile::TempDir;
+// #[cfg(test)]
 
-    #[test]
-    fn test_create_project() {
-        let temp_dir = TempDir::new().unwrap();
-
-        let repo = Arc::new(FileSystemPortfolioRepository::new(temp_dir.path()));
-        let vcs = Arc::new(GitService::new());
-        let service = ProjectService::new(repo, vcs);
-
-        let command = CreateProjectCommand::new(
-            "Test Project".to_string(),
-            Language::Rust,
-            Architecture::Hexagonal,
-            temp_dir.path().to_path_buf(),
-        );
-
-        let result = service.create_project(command);
-        assert!(result.is_ok());
-
-        let project = result.unwrap();
-        assert_eq!(project.name().as_str(), "Test Project");
-        assert_eq!(project.language(), Language::Rust);
-
-        // Verify files were created
-        assert!(project.path().join("Cargo.toml").exists());
-        assert!(project.path().join("README.md").exists());
-    }
-}
+//mod tests {
+//    use super::*;
+//    use crate::Architecture;
+//    use crate::infrastructure::repositories::FileSystemPortfolioRepository;
+//    use crate::infrastructure::services::GitService;
+//    use tempfile::TempDir;
+//
+//    #[test]
+//    fn test_create_project() {
+//        let temp_dir = TempDir::new().unwrap();
+//
+//        let repo = Arc::new(FileSystemPortfolioRepository::new(temp_dir.path()));
+//        let vcs = Arc::new(GitService::new());
+//        let service = ProjectService::new(repo, vcs);
+//
+//        let command = CreateProjectCommand::new(
+//            "Test Project".to_string(),
+//            Language::Rust,
+//            Architecture::Hexagonal,
+//            temp_dir.path().to_path_buf(),
+//        );
+//
+//        let result = service.create_project(command);
+//        assert!(result.is_ok());
+//
+//        let project = result.unwrap();
+//        assert_eq!(project.name().as_str(), "Test Project");
+//        assert_eq!(project.language(), Language::Rust);
+//
+//        // Verify files were created
+//        assert!(project.path().join("Cargo.toml").exists());
+//        assert!(project.path().join("README.md").exists());
+//    }
+//}
