@@ -24,7 +24,7 @@ impl ConfigLoader {
         let config: Config = toml::from_str(&content)?;
 
         // Override with environment variables if present
-        if let Ok(_) = std::env::var("GITLAB_TOKEN") {
+        if std::env::var("GITLAB_TOKEN").is_ok() {
             // Store token handling will be added later
             tracing::debug!("GitLab token loaded from environment");
         }
@@ -36,12 +36,12 @@ impl ConfigLoader {
     pub fn save(config: &Config, path: &Path) -> InfrastructureResult<()> {
         let content = toml::to_string_pretty(config)?;
 
-        // Create parent directory if it doesn't exist
+        // Create a parent directory if it doesn't exist
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).map_err(|err| InfrastructureError::Io(err))?;
+            fs::create_dir_all(parent).map_err(InfrastructureError::Io)?;
         }
 
-        fs::write(path, content).map_err(|err| InfrastructureError::Io(err))?;
+        fs::write(path, content).map_err(InfrastructureError::Io)?;
         Ok(())
     }
 
@@ -51,7 +51,7 @@ impl ConfigLoader {
             return PathBuf::from(path);
         }
 
-        // Try current directory first
+        // Try the current directory first
         if let Ok(dir) = std::env::current_dir() {
             let local_config = dir.join("portfolio.toml");
             if local_config.exists() {
@@ -59,7 +59,7 @@ impl ConfigLoader {
             }
         }
 
-        // Fall back to user config directory
+        // Fall back to the user config directory
         if let Some(config_dir) = dirs::config_dir() {
             return config_dir.join("portfolio-cli").join("portfolio.toml");
         }

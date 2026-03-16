@@ -10,6 +10,12 @@ pub struct CliApplication {
     cli: Cli,
 }
 
+impl Default for CliApplication {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CliApplication {
     /// Creates a new CLI application instance
     pub fn new() -> Self {

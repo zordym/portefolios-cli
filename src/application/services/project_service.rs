@@ -1,13 +1,11 @@
 use crate::application::dto::{CreateProjectCommand, UpdateProjectCommand};
 use crate::application::errors::{ApplicationError, ApplicationResult};
 use crate::domain::value_objects::{ProjectId, ProjectName};
-use crate::domain::{Architecture, Language, Project, Status};
+use crate::domain::{Language, Project, Status};
 use crate::infrastructure::InfrastructureError;
 use crate::infrastructure::repositories::PortfolioRepository;
 use crate::infrastructure::services::VersionControlService;
-use std::error::Error;
 use std::fs;
-use std::path::Path;
 use std::sync::Arc;
 
 /// Application service for project operations
@@ -28,7 +26,7 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
         // Validate command
         command
             .validate()
-            .map_err(|e| ApplicationError::ValidationError(e))?;
+            .map_err(ApplicationError::ValidationError)?;
 
         // Create domain objects
         let name = ProjectName::new(&command.name)?;
@@ -39,10 +37,10 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
             return Err(ApplicationError::ProjectAlreadyExists(id.to_string()));
         }
 
-        // Create project path
+        // Create a project path
         let project_path = command.base_path.join(id.as_str());
 
-        // Create project entity
+        // Create a project entity
         let mut project = Project::new(
             name,
             command.language,
@@ -57,7 +55,7 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
         // Create directory structure
         self.create_directory_structure(&project)?;
 
-        // Create build configuration
+        // Create a build configuration
         self.create_build_config(&project)?;
 
         // Create documentation
@@ -137,7 +135,7 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
 
     fn create_directory_structure(&self, project: &Project) -> ApplicationResult<()> {
         let base_path = project.path();
-        fs::create_dir_all(base_path).map_err(|err| InfrastructureError::Io(err))?;
+        fs::create_dir_all(base_path).map_err(InfrastructureError::Io)?;
 
         let src_base = match project.language() {
             Language::Kotlin => base_path.join("src/main/kotlin"),
@@ -147,11 +145,11 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
 
         // Create architecture-specific directories
         for layer in project.architecture().typical_layers() {
-            fs::create_dir_all(src_base.join(layer)).map_err(|err| InfrastructureError::Io(err))?;
+            fs::create_dir_all(src_base.join(layer)).map_err(InfrastructureError::Io)?;
         }
 
         // Create docs directories
-        fs::create_dir_all(base_path.join("docs")).map_err(|err| InfrastructureError::Io(err))?;
+        fs::create_dir_all(base_path.join("docs")).map_err(InfrastructureError::Io)?;
 
         Ok(())
     }
@@ -162,34 +160,33 @@ impl<R: PortfolioRepository, V: VersionControlService> ProjectService<R, V> {
 
         match project.language() {
             Language::Kotlin => {
-                let build_gradle = format!(
-                    r#"plugins {{
+                let build_gradle = r#"plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
     id("org.springframework.boot") version "3.2.1"
-}}
+}
 
 group = "com.portfolio"
 version = "0.1.0"
 
-repositories {{
+repositories {
     mavenCentral()
-}}
+}
 
-dependencies {{
+dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}}
+}
 "#
-                );
+                .to_string();
                 fs::write(path.join("build.gradle.kts"), build_gradle)
-                    .map_err(|err| InfrastructureError::Io(err))?;
+                    .map_err(InfrastructureError::Io)?;
                 fs::write(
                     path.join("settings.gradle.kts"),
                     format!("rootProject.name = \"{}\"", project_id),
                 )
-                .map_err(|err| InfrastructureError::Io(err))?;
+                .map_err(InfrastructureError::Io)?;
             }
             Language::Java => {
                 let pom = format!(
@@ -203,7 +200,7 @@ dependencies {{
 "#,
                     project_id
                 );
-                fs::write(path.join("pom.xml"), pom).map_err(|err| InfrastructureError::Io(err))?;
+                fs::write(path.join("pom.xml"), pom).map_err(InfrastructureError::Io)?;
             }
             Language::Rust => {
                 let cargo = format!(
@@ -216,8 +213,7 @@ edition = "2021"
 "#,
                     project_id
                 );
-                fs::write(path.join("Cargo.toml"), cargo)
-                    .map_err(|err| InfrastructureError::Io(err))?;
+                fs::write(path.join("Cargo.toml"), cargo).map_err(InfrastructureError::Io)?;
             }
         }
 
@@ -268,7 +264,7 @@ See `ARCHITECTURE.md` for detailed architecture documentation.
             project.language()
         );
 
-        fs::write(path.join("README.md"), readme).map_err(|err| InfrastructureError::Io(err))?;
+        fs::write(path.join("README.md"), readme).map_err(InfrastructureError::Io)?;
 
         let architecture_doc = format!(
             r#"# Architecture Documentation
@@ -303,7 +299,7 @@ Description of main components and their responsibilities.
         );
 
         fs::write(path.join("ARCHITECTURE.md"), architecture_doc)
-            .map_err(|err| InfrastructureError::Io(err))?;
+            .map_err(InfrastructureError::Io)?;
 
         Ok(())
     }
@@ -316,8 +312,7 @@ Description of main components and their responsibilities.
             }
         };
 
-        fs::write(project.path().join(".gitignore"), gitignore)
-            .map_err(|err| InfrastructureError::Io(err))?;
+        fs::write(project.path().join(".gitignore"), gitignore).map_err(InfrastructureError::Io)?;
         Ok(())
     }
 }
@@ -325,6 +320,7 @@ Description of main components and their responsibilities.
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Architecture;
     use crate::infrastructure::repositories::FileSystemPortfolioRepository;
     use crate::infrastructure::services::GitService;
     use tempfile::TempDir;

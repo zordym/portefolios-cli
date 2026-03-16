@@ -149,7 +149,7 @@ portfolio-cli delete my-project --yes
 
 ## Architecture
 
-The project follows a **layered architecture** with clear separation of concerns:
+The project follows a **layered architecture** with a clear separation of concerns:
 
 ```
 src/
@@ -215,4 +215,4 @@ Mollet Tristan
 
 ## License
 
-See LICENSE file for details.
+See the LICENSE file for details.

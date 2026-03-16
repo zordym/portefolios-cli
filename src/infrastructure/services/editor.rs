@@ -53,7 +53,7 @@ impl Default for SystemEditorService {
 
 impl EditorService for SystemEditorService {
     fn open(&self, path: &Path, editor: &str) -> InfrastructureResult<()> {
-        // Validate path
+        // Validate a path
         self.validate_path(path)?;
 
         // Launch editor (non-blocking)

@@ -8,7 +8,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
-/// File system based portfolio repository
+/// File system-based portfolio repository
 ///
 /// Stores projects as individual project.toml files in directories
 pub struct FileSystemPortfolioRepository {

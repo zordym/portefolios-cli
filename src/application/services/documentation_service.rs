@@ -19,7 +19,7 @@ impl DocumentationService {
         output_dir: &Path,
         detailed: bool,
     ) -> ApplicationResult<()> {
-        fs::create_dir_all(output_dir).map_err(|err| InfrastructureError::Io(err))?;
+        fs::create_dir_all(output_dir).map_err(InfrastructureError::Io)?;
         let mut content = String::from("# Architecture Portfolio\n\n");
         content.push_str("## Projects Overview\n\n");
 

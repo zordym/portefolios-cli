@@ -139,20 +139,20 @@ impl Portfolio {
         self.projects
             .iter()
             .filter(|p| {
-                if let Some(lang) = language {
-                    if p.language() != lang {
-                        return false;
-                    }
+                if let Some(lang) = language
+                    && p.language() != lang
+                {
+                    return false;
                 }
-                if let Some(arch) = architecture {
-                    if p.architecture() != arch {
-                        return false;
-                    }
+                if let Some(arch) = architecture
+                    && p.architecture() != arch
+                {
+                    return false;
                 }
-                if let Some(stat) = status {
-                    if p.status() != stat {
-                        return false;
-                    }
+                if let Some(stat) = status
+                    && p.status() != stat
+                {
+                    return false;
                 }
                 true
             })
