@@ -19,10 +19,10 @@ impl<R: PortfolioRepository> PortfolioService<R> {
     /// Get a single project
     pub fn get_project(&self, query: ProjectQuery) -> ApplicationResult<Project> {
         // Try as ID first
-        if let Ok(id) = ProjectId::new(&query.identifier) {
-            if let Some(project) = self.repository.find_by_id(&id)? {
-                return Ok(project);
-            }
+        if let Ok(id) = ProjectId::new(&query.identifier)
+            && let Some(project) = self.repository.find_by_id(&id)?
+        {
+            return Ok(project);
         }
 
         // Search in all projects by name
@@ -30,7 +30,7 @@ impl<R: PortfolioRepository> PortfolioService<R> {
         portfolio
             .find_by_name_or_id(&query.identifier)
             .cloned()
-            .ok_or_else(|| ApplicationError::ProjectNotFound(query.identifier))
+            .ok_or(ApplicationError::ProjectNotFound(query.identifier))
     }
 
     /// List projects with filters

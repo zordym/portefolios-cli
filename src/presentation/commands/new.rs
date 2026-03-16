@@ -1,7 +1,7 @@
 use crate::application::ProjectService;
 use crate::application::dto::CreateProjectCommand;
 use crate::domain::{Architecture, Language};
-use crate::infrastructure::config::Config;
+use crate::infrastructure::config::ConfigStructure;
 use crate::infrastructure::repositories::PortfolioRepository;
 use crate::infrastructure::services::VersionControlService;
 use anyhow::Result;
@@ -9,7 +9,7 @@ use colored::Colorize;
 
 pub fn execute<R: PortfolioRepository, V: VersionControlService>(
     service: &ProjectService<R, V>,
-    config: &Config,
+    config: &ConfigStructure,
     name: String,
     language: String,
     architecture: String,

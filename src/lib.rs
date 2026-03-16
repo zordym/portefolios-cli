@@ -17,4 +17,4 @@ pub mod presentation;
 pub use application::{PortfolioService, ProjectService};
 // Re-export commonly used types for convenience
 pub use domain::{Architecture, Language, Portfolio, Project, Status};
-pub use infrastructure::{Config, PortfolioRepository};
+pub use infrastructure::{ConfigStructure, PortfolioRepository};

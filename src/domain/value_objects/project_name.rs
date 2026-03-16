@@ -9,7 +9,7 @@ use std::fmt;
 /// - Not be empty or whitespace-only
 /// - Be between 1 and 255 characters
 /// - Not contain path separators (/, \)
-/// - Not contain path traversal sequences (..)
+/// - Not contain path traversal sequences (...)
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ProjectName(String);
@@ -65,8 +65,7 @@ impl ProjectName {
         let mut id = self
             .0
             .to_lowercase()
-            .replace(' ', "-")
-            .replace('_', "-")
+            .replace([' ', '_'], "-")
             .chars()
             .filter(|c| c.is_ascii_alphanumeric() || *c == '-')
             .collect::<String>();

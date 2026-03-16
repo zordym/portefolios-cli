@@ -15,7 +15,7 @@ interface to create projects, track their progress, and generate documentation.
 - **Multi-Language Support**: Manage projects in Kotlin, Java, and Rust
 - **Status Tracking**: Monitor project status (planned, in-progress, completed, archived)
 - **Documentation Generation**: Automatically generate portfolio documentation
-- **Project Launcher**: Open projects in your configured editor or terminal
+- **Project Launcher**: Open projects in your configured _editor or _terminal
 - **Statistics Dashboard**: View portfolio statistics and completion rates
 - **Filtering & Search**: Filter projects by language, architecture, or status
 
@@ -93,14 +93,14 @@ portfolio-cli update my-project \
 #### Open a Project
 
 ```bash
-# Open in configured editor
+# Open in configured _editor
 portfolio-cli open my-project
 
-# Open in terminal
-portfolio-cli open my-project --terminal
+# Open in _terminal
+portfolio-cli open my-project --_terminal
 
-# Use specific editor
-portfolio-cli open my-project --editor code
+# Use specific _editor
+portfolio-cli open my-project --_editor code
 ```
 
 #### Run a Project
@@ -109,11 +109,11 @@ portfolio-cli open my-project --editor code
 # Run with default settings
 portfolio-cli run my-project
 
-# Run with custom port
-portfolio-cli run my-project --port 8080
+# Run with custom _port
+portfolio-cli run my-project --_port 8080
 
-# Run with specific profile
-portfolio-cli run my-project --profile prod --debug
+# Run with specific _profile
+portfolio-cli run my-project --_profile prod --_debug
 ```
 
 #### Generate Documentation
@@ -149,7 +149,7 @@ portfolio-cli delete my-project --yes
 
 ## Architecture
 
-The project follows a **layered architecture** with clear separation of concerns:
+The project follows a **layered architecture** with a clear separation of concerns:
 
 ```
 src/
@@ -166,7 +166,7 @@ Configuration is stored in `~/.config/portfolio-cli/config.toml` (or custom loca
 Example configuration:
 
 ```toml
-[editor]
+[_editor]
 default = "code"
 
 [projects]
@@ -215,4 +215,4 @@ Mollet Tristan
 
 ## License
 
-See LICENSE file for details.
+See the LICENSE file for details.

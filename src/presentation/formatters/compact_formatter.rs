@@ -13,12 +13,13 @@ impl ProjectFormatter for CompactFormatter {
         let mut output = String::new();
 
         for project in projects {
+            let status = format!("{} {}", project.status().symbol(), project.status());
             output.push_str(&format!(
                 "{} ({}) - {} [{}]\n",
                 project.name().to_string().bold(),
                 project.language(),
                 project.architecture(),
-                format!("{} {}", project.status().symbol(), project.status())
+                status
             ));
         }
 
